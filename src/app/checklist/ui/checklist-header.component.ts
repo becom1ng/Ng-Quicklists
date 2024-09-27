@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { Checklist } from '../../shared/interfaces/checklist';
 import { RouterLink } from '@angular/router';
 
@@ -12,9 +12,13 @@ import { RouterLink } from '@angular/router';
       <h1>
         {{ checklist().title }}
       </h1>
+      <div>
+        <button (click)="addItem.emit()">Add Item</button>
+      </div>
     </header>
   `,
 })
 export class ChecklistHeaderComponent {
   checklist = input.required<Checklist>();
+  addItem = output();
 }
