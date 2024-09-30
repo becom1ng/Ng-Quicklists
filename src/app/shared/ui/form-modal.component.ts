@@ -1,5 +1,5 @@
 import { KeyValuePipe, TitleCasePipe } from '@angular/common';
-import { Component, EventEmitter, input, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 @Component({

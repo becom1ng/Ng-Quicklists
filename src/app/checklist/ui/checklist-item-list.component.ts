@@ -44,6 +44,7 @@ import {
         font-size: 1.5em;
         display: flex;
         justify-content: space-between;
+        align-items: center;
         background: var(--color-light);
         list-style-type: none;
         margin-bottom: 1rem;
