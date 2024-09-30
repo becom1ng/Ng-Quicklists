@@ -1,5 +1,11 @@
 /* You can add global styles to this file, and also import other style files */
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 :root {
   --color-primary: #32db64;
   --color-secondary: #2dd36f;
@@ -14,7 +20,7 @@ html {
 
 body {
   margin: 0;
-  height: 100%;
+  min-height: 100dvh;
   background: var(--color-dark);
   font-family: "Roboto", sans-serif;
 }
@@ -23,7 +29,7 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 2rem;
+  padding: 1rem 2rem;
   background: var(--color-light);
 }
 
@@ -34,12 +40,10 @@ section {
 }
 
 button {
-  // height: 30px;
   border: 2px solid;
   color: var(--color-dark);
   background-color: var(--color-medium);
   border-color: var(--color-dark);
-  // border-radius: 6px;
   font-size: 1rem;
   padding: .5rem;
 }
