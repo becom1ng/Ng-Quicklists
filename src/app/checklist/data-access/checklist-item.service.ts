@@ -2,6 +2,7 @@ import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import {
   AddChecklistItem,
   ChecklistItem,
+  EditChecklistItem,
   RemoveChecklistItem,
 } from '../../shared/interfaces/checklist-item';
 import { Subject } from 'rxjs';
@@ -35,8 +36,11 @@ export class ChecklistItemService {
   //sources / actions
   private checklistItemsLoaded$ = this.storageService.loadChecklistItems();
   add$ = new Subject<AddChecklistItem>();
+  edit$ = new Subject<EditChecklistItem>();
+  remove$ = new Subject<RemoveChecklistItem>();
   toggle$ = new Subject<RemoveChecklistItem>();
   reset$ = new Subject<RemoveChecklist>();
+  checklistRemoved$ = new Subject<RemoveChecklist>();
 
   constructor() {
     // reducers
@@ -52,6 +56,22 @@ export class ChecklistItemService {
             checked: false,
           },
         ],
+      }))
+    );
+
+    this.edit$.pipe(takeUntilDestroyed()).subscribe((update) =>
+      this.state.update((state) => ({
+        ...state,
+        checklistItems: state.checklistItems.map((item) =>
+          item.id === update.id ? { ...item, title: update.data.title } : item
+        ),
+      }))
+    );
+
+    this.remove$.pipe(takeUntilDestroyed()).subscribe((id) =>
+      this.state.update((state) => ({
+        ...state,
+        checklistItems: state.checklistItems.filter((item) => item.id !== id),
       }))
     );
 
@@ -71,6 +91,15 @@ export class ChecklistItemService {
         ...state,
         checklistItems: state.checklistItems.map((item) =>
           item.checklistId === checklistId ? { ...item, checked: false } : item
+        ),
+      }))
+    );
+
+    this.checklistRemoved$.pipe(takeUntilDestroyed()).subscribe((checklistId) =>
+      this.state.update((state) => ({
+        ...state,
+        checklistItems: state.checklistItems.filter(
+          (item) => item.checklistId !== checklistId
         ),
       }))
     );
