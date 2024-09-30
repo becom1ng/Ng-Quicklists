@@ -23,6 +23,8 @@ import { ChecklistItemListComponent } from './ui/checklist-item-list.component';
     @if (checklist(); as checklist) {
     <app-checklist-header
       [checklist]="checklist"
+      [totalItems]="items().length"
+      [completedItems]="completedItems()"
       (resetChecklist)="checklistItemService.reset$.next($event)"
       (addItem)="checklistItemBeingEdited.set({})"
     />
@@ -77,6 +79,10 @@ export default class ChecklistComponent {
     this.checklistItemService
       .checklistItems()
       .filter((item) => item.checklistId === this.params()?.get('id'))
+  );
+
+  completedItems = computed(
+    () => this.items().filter((item) => item.checked === true).length
   );
 
   checklistItemForm = this.formBuilder.nonNullable.group({

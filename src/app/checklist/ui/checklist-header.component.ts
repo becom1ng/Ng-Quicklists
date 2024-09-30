@@ -10,7 +10,7 @@ import { RouterLink } from '@angular/router';
     <header>
       <a routerLink="/home">Back</a>
       <h1>
-        {{ checklist().title }}
+        {{ checklist().title }} ({{ completedItems() }} / {{ totalItems() }})
       </h1>
       <div>
         <button (click)="resetChecklist.emit(checklist().id)">Reset</button>
@@ -28,6 +28,8 @@ import { RouterLink } from '@angular/router';
 })
 export class ChecklistHeaderComponent {
   checklist = input.required<Checklist>();
+  totalItems = input.required<number>();
+  completedItems = input.required<number>();
   addItem = output();
   resetChecklist = output<RemoveChecklist>();
 }

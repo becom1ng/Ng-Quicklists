@@ -48,6 +48,13 @@ import { ChecklistListComponent } from './ui/checklist-list.component';
       />
     </section>
   `,
+  styles: [
+    `
+      section h2 {
+        margin-bottom: 1rem;
+      }
+    `,
+  ],
 })
 export default class HomeComponent {
   checklistService = inject(ChecklistService);
