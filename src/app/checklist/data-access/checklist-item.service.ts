@@ -5,11 +5,10 @@ import {
   EditChecklistItem,
   RemoveChecklistItem,
 } from '../../shared/interfaces/checklist-item';
-import { Subject } from 'rxjs';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { catchError, EMPTY, map, merge, Subject } from 'rxjs';
 import { RemoveChecklist } from '../../shared/interfaces/checklist';
 import { StorageService } from '../../shared/data-access/storage.service';
-import { reducer } from '../../shared/utils/reducer';
+import { connect } from 'ngxtension/connect';
 
 export interface ChecklistItemsState {
   checklistItems: ChecklistItem[];
@@ -35,7 +34,13 @@ export class ChecklistItemService {
   loaded = computed(() => this.state().loaded);
 
   //sources / actions
-  private checklistItemsLoaded$ = this.storageService.loadChecklistItems();
+  private checklistItemsLoaded$ = this.storageService.loadChecklistItems().pipe(
+    catchError((err) => {
+      this.error$.next(err);
+      return EMPTY;
+    })
+  );
+  private error$ = new Subject<string>();
   add$ = new Subject<AddChecklistItem>();
   edit$ = new Subject<EditChecklistItem>();
   remove$ = new Subject<RemoveChecklistItem>();
@@ -45,9 +50,16 @@ export class ChecklistItemService {
 
   constructor() {
     // reducers
-    reducer(this.add$, (checklistItem) =>
-      this.state.update((state) => ({
-        ...state,
+    const nextState$ = merge(
+      this.checklistItemsLoaded$.pipe(
+        map((checklistItems) => ({ checklistItems, loaded: true }))
+      ),
+      this.error$.pipe(map((error) => ({ error })))
+    );
+
+    connect(this.state)
+      .with(nextState$)
+      .with(this.add$, (state, checklistItem) => ({
         checklistItems: [
           ...state.checklistItems,
           {
@@ -58,63 +70,31 @@ export class ChecklistItemService {
           },
         ],
       }))
-    );
-
-    reducer(this.edit$, (update) =>
-      this.state.update((state) => ({
-        ...state,
+      .with(this.edit$, (state, update) => ({
         checklistItems: state.checklistItems.map((item) =>
           item.id === update.id ? { ...item, title: update.data.title } : item
         ),
       }))
-    );
-
-    reducer(this.remove$, (id) =>
-      this.state.update((state) => ({
-        ...state,
+      .with(this.remove$, (state, id) => ({
         checklistItems: state.checklistItems.filter((item) => item.id !== id),
       }))
-    );
-
-    reducer(this.toggle$, (checklistItemId) =>
-      this.state.update((state) => ({
-        ...state,
+      .with(this.toggle$, (state, checklistItemId) => ({
         checklistItems: state.checklistItems.map((item) =>
           item.id === checklistItemId
             ? { ...item, checked: !item.checked }
             : item
         ),
       }))
-    );
-
-    reducer(this.reset$, (checklistId) =>
-      this.state.update((state) => ({
-        ...state,
+      .with(this.reset$, (state, checklistId) => ({
         checklistItems: state.checklistItems.map((item) =>
           item.checklistId === checklistId ? { ...item, checked: false } : item
         ),
       }))
-    );
-
-    reducer(this.checklistRemoved$, (checklistId) =>
-      this.state.update((state) => ({
-        ...state,
+      .with(this.checklistRemoved$, (state, checklistId) => ({
         checklistItems: state.checklistItems.filter(
           (item) => item.checklistId !== checklistId
         ),
-      }))
-    );
-
-    reducer(
-      this.checklistItemsLoaded$,
-      (checklistItems) =>
-        this.state.update((state) => ({
-          ...state,
-          checklistItems: checklistItems,
-          loaded: true,
-        })),
-      (error) => this.state.update((state) => ({ ...state, error }))
-    );
+      }));
 
     // effects
     effect(() => {
