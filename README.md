@@ -2,7 +2,7 @@
 
 Upgraded version of a todo application, created to explore custom state management with Signals and RxJs.
 
-#### Features
+### Features
 
 - Add, edit, and remove checklists.
 - Add, edit, and remove items within each checklist (checklist within checklist).
