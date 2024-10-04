@@ -9,6 +9,7 @@ import { Subject } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RemoveChecklist } from '../../shared/interfaces/checklist';
 import { StorageService } from '../../shared/data-access/storage.service';
+import { reducer } from '../../shared/utils/reducer';
 
 export interface ChecklistItemsState {
   checklistItems: ChecklistItem[];
@@ -44,7 +45,7 @@ export class ChecklistItemService {
 
   constructor() {
     // reducers
-    this.add$.pipe(takeUntilDestroyed()).subscribe((checklistItem) =>
+    reducer(this.add$, (checklistItem) =>
       this.state.update((state) => ({
         ...state,
         checklistItems: [
@@ -59,7 +60,7 @@ export class ChecklistItemService {
       }))
     );
 
-    this.edit$.pipe(takeUntilDestroyed()).subscribe((update) =>
+    reducer(this.edit$, (update) =>
       this.state.update((state) => ({
         ...state,
         checklistItems: state.checklistItems.map((item) =>
@@ -68,14 +69,14 @@ export class ChecklistItemService {
       }))
     );
 
-    this.remove$.pipe(takeUntilDestroyed()).subscribe((id) =>
+    reducer(this.remove$, (id) =>
       this.state.update((state) => ({
         ...state,
         checklistItems: state.checklistItems.filter((item) => item.id !== id),
       }))
     );
 
-    this.toggle$.pipe(takeUntilDestroyed()).subscribe((checklistItemId) =>
+    reducer(this.toggle$, (checklistItemId) =>
       this.state.update((state) => ({
         ...state,
         checklistItems: state.checklistItems.map((item) =>
@@ -86,7 +87,7 @@ export class ChecklistItemService {
       }))
     );
 
-    this.reset$.pipe(takeUntilDestroyed()).subscribe((checklistId) =>
+    reducer(this.reset$, (checklistId) =>
       this.state.update((state) => ({
         ...state,
         checklistItems: state.checklistItems.map((item) =>
@@ -95,7 +96,7 @@ export class ChecklistItemService {
       }))
     );
 
-    this.checklistRemoved$.pipe(takeUntilDestroyed()).subscribe((checklistId) =>
+    reducer(this.checklistRemoved$, (checklistId) =>
       this.state.update((state) => ({
         ...state,
         checklistItems: state.checklistItems.filter(
@@ -104,15 +105,16 @@ export class ChecklistItemService {
       }))
     );
 
-    this.checklistItemsLoaded$.pipe(takeUntilDestroyed()).subscribe({
-      next: (checklistItems) =>
+    reducer(
+      this.checklistItemsLoaded$,
+      (checklistItems) =>
         this.state.update((state) => ({
           ...state,
           checklistItems: checklistItems,
           loaded: true,
         })),
-      error: (err) => this.state.update((state) => ({ ...state, error: err })),
-    });
+      (error) => this.state.update((state) => ({ ...state, error }))
+    );
 
     // effects
     effect(() => {
