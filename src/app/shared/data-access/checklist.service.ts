@@ -1,19 +1,15 @@
-import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import {
-  AddChecklist,
-  Checklist,
-  EditChecklist,
-} from '../interfaces/checklist';
-import { catchError, EMPTY, map, merge, Subject } from 'rxjs';
+  effect,
+  inject,
+  Injectable,
+  linkedSignal,
+  ResourceStatus,
+} from '@angular/core';
+import { AddChecklist, EditChecklist } from '../interfaces/checklist';
+import { Subject } from 'rxjs';
 import { StorageService } from './storage.service';
 import { ChecklistItemService } from '../../checklist/data-access/checklist-item.service';
-import { connect } from 'ngxtension/connect';
-
-export interface ChecklistsState {
-  checklists: Checklist[];
-  loaded: boolean;
-  error: string | null;
-}
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Injectable({
   providedIn: 'root',
@@ -22,58 +18,54 @@ export class ChecklistService {
   storageService = inject(StorageService);
   checklistItemService = inject(ChecklistItemService);
 
-  // state
-  private state = signal<ChecklistsState>({
-    checklists: [],
-    loaded: false,
-    error: null,
-  });
-
-  // selectors
-  checklists = computed(() => this.state().checklists);
-  loaded = computed(() => this.state().loaded);
-
-  // sources / actions
-  private checklistsLoaded$ = this.storageService.loadChecklists().pipe(
-    catchError((err) => {
-      this.error$.next(err);
-      return EMPTY;
-    })
-  );
-  private error$ = new Subject<string>();
+  // sources
+  loadedChecklists = this.storageService.loadChecklists();
   add$ = new Subject<AddChecklist>();
   edit$ = new Subject<EditChecklist>();
   remove$ = this.checklistItemService.checklistRemoved$;
 
+  // state
+  checklists = linkedSignal({
+    source: this.loadedChecklists.value,
+    computation: (checklists) => checklists ?? [],
+  });
+
   constructor() {
     // reducers
-    const nextState$ = merge(
-      this.checklistsLoaded$.pipe(
-        map((checklists) => ({ checklists, loaded: true }))
-      ),
-      this.error$.pipe(map((error) => ({ error })))
-    );
+    this.add$
+      .pipe(takeUntilDestroyed())
+      .subscribe((checklist) =>
+        this.checklists.update((checklists) => [
+          ...checklists,
+          this.addIdToChecklist(checklist),
+        ])
+      );
 
-    connect(this.state)
-      .with(nextState$)
-      .with(this.add$, (state, checklist) => ({
-        checklists: [...state.checklists, this.addIdToChecklist(checklist)],
-      }))
-      .with(this.edit$, (state, update) => ({
-        checklists: state.checklists.map((checklist) =>
-          checklist.id === update.id
-            ? { ...checklist, title: update.data.title }
-            : checklist
-        ),
-      }))
-      .with(this.remove$, (state, id) => ({
-        checklists: state.checklists.filter((checklist) => checklist.id !== id),
-      }));
+    this.remove$
+      .pipe(takeUntilDestroyed())
+      .subscribe((id) =>
+        this.checklists.update((checklists) =>
+          checklists.filter((checklist) => checklist.id !== id)
+        )
+      );
+
+    this.edit$
+      .pipe(takeUntilDestroyed())
+      .subscribe((update) =>
+        this.checklists.update((checklists) =>
+          checklists.map((checklist) =>
+            checklist.id === update.id
+              ? { ...checklist, title: update.data.title }
+              : checklist
+          )
+        )
+      );
 
     // effects
     effect(() => {
-      if (this.loaded()) {
-        this.storageService.saveChecklists(this.checklists());
+      const checklists = this.checklists();
+      if (this.loadedChecklists.status() === ResourceStatus.Resolved) {
+        this.storageService.saveChecklists(checklists);
       }
     });
   }
