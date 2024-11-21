@@ -9,10 +9,9 @@ import {
 } from '@angular/core';
 
 @Component({
-  selector: 'app-modal',
-  standalone: true,
-  imports: [],
-  template: `<div></div> `,
+    selector: 'app-modal',
+    imports: [],
+    template: `<div></div> `
 })
 export class ModalComponent {
   dialog = inject(Dialog);

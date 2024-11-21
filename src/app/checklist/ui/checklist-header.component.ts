@@ -3,10 +3,9 @@ import { Checklist, RemoveChecklist } from '../../shared/interfaces/checklist';
 import { RouterLink } from '@angular/router';
 
 @Component({
-  selector: 'app-checklist-header',
-  standalone: true,
-  imports: [RouterLink],
-  template: `
+    selector: 'app-checklist-header',
+    imports: [RouterLink],
+    template: `
     <header>
       <a routerLink="/home">Back</a>
       <h1>
@@ -18,13 +17,13 @@ import { RouterLink } from '@angular/router';
       </div>
     </header>
   `,
-  styles: [
-    `
+    styles: [
+        `
       button {
         margin-left: 1rem;
       }
     `,
-  ],
+    ]
 })
 export class ChecklistHeaderComponent {
   checklist = input.required<Checklist>();

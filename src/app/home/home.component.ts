@@ -7,10 +7,9 @@ import { ChecklistService } from '../shared/data-access/checklist.service';
 import { ChecklistListComponent } from './ui/checklist-list.component';
 
 @Component({
-  selector: 'app-home',
-  standalone: true,
-  imports: [ModalComponent, FormModalComponent, ChecklistListComponent],
-  template: `
+    selector: 'app-home',
+    imports: [ModalComponent, FormModalComponent, ChecklistListComponent],
+    template: `
     <header>
       <h1>Quicklists</h1>
       <button (click)="checklistBeingEdited.set({})">Add Checklist</button>
@@ -48,13 +47,13 @@ import { ChecklistListComponent } from './ui/checklist-list.component';
       />
     </section>
   `,
-  styles: [
-    `
+    styles: [
+        `
       section h2 {
         margin-bottom: 1rem;
       }
     `,
-  ],
+    ]
 })
 export default class HomeComponent {
   checklistService = inject(ChecklistService);

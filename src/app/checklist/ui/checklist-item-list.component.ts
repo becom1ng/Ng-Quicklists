@@ -5,10 +5,9 @@ import {
 } from '../../shared/interfaces/checklist-item';
 
 @Component({
-  selector: 'app-checklist-item-list',
-  standalone: true,
-  imports: [],
-  template: `
+    selector: 'app-checklist-item-list',
+    imports: [],
+    template: `
     <section>
       <ul>
         @for (item of checklistItems(); track item.id){
@@ -34,8 +33,8 @@ import {
       </ul>
     </section>
   `,
-  styles: [
-    `
+    styles: [
+        `
       ul {
         padding: 0;
         margin: 0;
@@ -55,7 +54,7 @@ import {
         }
       }
     `,
-  ],
+    ]
 })
 export class ChecklistItemListComponent {
   checklistItems = input.required<ChecklistItem[]>();

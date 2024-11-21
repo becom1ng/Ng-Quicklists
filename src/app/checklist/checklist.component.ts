@@ -11,15 +11,14 @@ import { FormModalComponent } from '../shared/ui/form-modal.component';
 import { ChecklistItemListComponent } from './ui/checklist-item-list.component';
 
 @Component({
-  selector: 'app-checklist',
-  standalone: true,
-  imports: [
-    ChecklistHeaderComponent,
-    ModalComponent,
-    FormModalComponent,
-    ChecklistItemListComponent,
-  ],
-  template: `
+    selector: 'app-checklist',
+    imports: [
+        ChecklistHeaderComponent,
+        ModalComponent,
+        FormModalComponent,
+        ChecklistItemListComponent,
+    ],
+    template: `
     @if (checklist(); as checklist) {
     <app-checklist-header
       [checklist]="checklist"
@@ -57,7 +56,7 @@ import { ChecklistItemListComponent } from './ui/checklist-item-list.component';
         ></app-form-modal>
       </ng-template>
     </app-modal>
-  `,
+  `
 })
 export default class ChecklistComponent {
   checklistService = inject(ChecklistService);

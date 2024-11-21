@@ -3,10 +3,9 @@ import { Component, input, output } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-form-modal',
-  standalone: true,
-  imports: [ReactiveFormsModule, KeyValuePipe, TitleCasePipe],
-  template: `
+    selector: 'app-form-modal',
+    imports: [ReactiveFormsModule, KeyValuePipe, TitleCasePipe],
+    template: `
     <header>
       <h2>{{ title() }}</h2>
       <button (click)="close.emit()">close</button>
@@ -27,8 +26,8 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
       </form>
     </section>
   `,
-  styles: [
-    `
+    styles: [
+        `
       label {
         font-size: 1.25rem;
         font-weight: 600;
@@ -39,7 +38,7 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
         padding: 0.5rem;
       }
     `,
-  ],
+    ]
 })
 export class FormModalComponent {
   formGroup = input.required<FormGroup>();

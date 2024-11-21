@@ -3,10 +3,9 @@ import { Checklist, RemoveChecklist } from '../../shared/interfaces/checklist';
 import { RouterLink } from '@angular/router';
 
 @Component({
-  selector: 'app-checklist-list',
-  standalone: true,
-  imports: [RouterLink],
-  template: `
+    selector: 'app-checklist-list',
+    imports: [RouterLink],
+    template: `
     <ul>
       @for (checklist of checklists(); track checklist.id){
       <li>
@@ -23,8 +22,8 @@ import { RouterLink } from '@angular/router';
       }
     </ul>
   `,
-  styles: [
-    `
+    styles: [
+        `
       ul {
         padding: 0;
         margin: 0;
@@ -45,7 +44,7 @@ import { RouterLink } from '@angular/router';
         }
       }
     `,
-  ],
+    ]
 })
 export class ChecklistListComponent {
   checklists = input.required<Checklist[]>();
